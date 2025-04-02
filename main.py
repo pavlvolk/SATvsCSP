@@ -1,16 +1,12 @@
-# This is a sample Python script.
+import CSP_Solver as CS
 
-# Press Umschalt+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+task = CS.CSP(variables=4)
+task.commonDomain(domain=[1, 2])
+task.addConstraint("value[1] != value[2]")
+task.addConstraint("value[1] != value[3]")
+task.addConstraint("value[2] != value[4]")
+task.addConstraint("value[3] != value[4]")
+task.solve_BackTrack(timeout=10)
 
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Strg+F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+for i in range(1, 5):
+        print(f"Cell {i}: {task.value[i]}")
