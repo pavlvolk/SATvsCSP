@@ -1,5 +1,3 @@
-import math
-
 import CSP_Solver as CS
 
 def create_sudoku_csp(size, path)->CS:
@@ -139,15 +137,10 @@ def check_uniqueness(task, size, values):
         print("Sudoku not unique")
     f.close()
 
-
-def create_sudoku_sat(size):
-    h=""
-
 task = create_sudoku_csp(4, path="Solutions/")
 values = [0, 0, 0, 3,
           0, 4, 0, 0,
           1, 0, 0, 4,
           0, 0, 3, 0]
 add_set_values(task, values, 4)
-#task.solve_BackTrack(timeout=10)
 check_uniqueness(task, 4, values)
