@@ -112,23 +112,32 @@ def add_subgrid_constraints_6x6(task):
 
 
 def add_set_values(task, values, size):
-    for i in range(0, size**2):
-        if values[i] != 0:
-            task.setValue(i+1, values[i])
+    for i in range(0, size):
+        for j in range(0, size):
+            if values[i][j] != 0:
+                task.setValue(i*size + j + 1, values[i][j])
+
+
+def solve_sudoku(size, path, values)->CS:
+    task = create_sudoku_csp(size, path)
+    add_set_values(task, values, size)
+    task.solve_BackTrack(timeout=100)
+    return task
 
 
 def check_uniqueness(task, size, values):
-    task.solve_BackTrack(timeout=10)
+    task.solve_BackTrack(timeout=100)
     res = ""
-    for i in range(1, size**2+1):
-        if i < size**2:
-            res += "value["+str(i)+"] == "+str(task.value[i])+" and "
-        else:
-            res += "value[" + str(i) + "] == " + str(task.value[i])
+    for i in range(0, size):
+        for j in range(0, size):
+            if i < size-1 or j < size-1:
+                res += "value["+str(i*size + j + 1)+"] == "+str(task.value[i*size + j + 1])+" and "
+            else:
+                res += "value[" + str(i*size + j + 1) + "] == " + str(task.value[i*size + j + 1])
     unique_task = create_sudoku_csp(size, path="CheckedSolutions/")
     unique_task.addConstraint("not ("+res+")")
     add_set_values(unique_task, values, size)
-    unique_task.solve_BackTrack(timeout=10)
+    unique_task.solve_BackTrack(timeout=100)
     f = open(unique_task.solution_path + 'BackTrack_Solution.txt', 'r')
     text = f.read()
     if "No valid solution exist" in text:
@@ -136,11 +145,3 @@ def check_uniqueness(task, size, values):
     else:
         print("Sudoku not unique")
     f.close()
-
-task = create_sudoku_csp(4, path="Solutions/")
-values = [0, 0, 0, 3,
-          0, 4, 0, 0,
-          1, 0, 0, 4,
-          0, 0, 3, 0]
-add_set_values(task, values, 4)
-check_uniqueness(task, 4, values)
