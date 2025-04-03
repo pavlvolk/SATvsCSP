@@ -79,22 +79,14 @@ def add_sudoku_hints(cnf, puzzle):
                 cnf.append([varnum(r + 1, c + 1, puzzle[r][c])])
 
 
-def solve_sudoku(size):
-    cnf = CNF(from_clauses=[[-1, 2], [-1, -2]])
-    with Cadical195(cnf) as solver:
-        print('formula is', f'{"s" if solver.solve() else "uns"}atisfiable')
-
-        # 1.2 the formula is satisfiable and so has a model:
-        print('and the model is:', solver.get_model())
-
-        # 2.1 apply the MiniSat-like assumption interface:
-        print('formula is',
-              f'{"s" if solver.solve(assumptions=[1, 2]) else "uns"}atisfiable',
-              'assuming x1 and x2')
-
-        # 2.2 the formula is unsatisfiable,
-        # i.e. an unsatisfiable core can be extracted:
-        print('and the unsatisfiable core is:', solver.get_core())
+def solve_sudoku(size, hints):
+    sudoku = create_sudoku(size)
+    add_sudoku_hints(sudoku, hints)
+    solver = Cadical195()
+    if solver.solve(sudoku):
+        print("Sudoku is solvable")
+    else:
+        print("No solution found!")
 
 
 def add_sudoku_hints(cnf, puzzle):
@@ -112,26 +104,3 @@ def check_uniqueness(cnf, solver):
             print("The sudoku is not unique")
         else:
             print("The sudoku is unique")
-
-puzzle = [
-    [5, 3, 0, 0, 7, 0, 0, 0, 0],
-    [6, 0, 0, 1, 9, 5, 0, 0, 0],
-    [0, 9, 8, 0, 0, 0, 0, 6, 0],
-    [8, 0, 0, 0, 6, 0, 0, 0, 3],
-    [4, 0, 0, 8, 0, 3, 0, 0, 1],
-    [7, 0, 0, 0, 2, 0, 0, 0, 6],
-    [0, 6, 0, 0, 0, 0, 2, 8, 0],
-    [0, 0, 0, 4, 1, 9, 0, 0, 5],
-    [0, 0, 0, 0, 8, 0, 0, 7, 9]
-]
-
-
-s = create_sudoku(9)
-add_sudoku_hints(s, puzzle)
-solver = Cadical195(s)
-if solver.solve():
-    print("Sudoku is solvable")
-else:
-    print("No solution found!")
-
-check_uniqueness(s, solver)
