@@ -85,7 +85,7 @@ def add_subgrid_constraints_9x9(task):
 def add_subgrid_constraints_4x4(task):
     for vertical_grid in range(0, 2):
         for grid in range(0, 2):
-            ul = 1 + vertical_grid * 4 + 2 * grid
+            ul = 1 + vertical_grid * 8 + 2 * grid
             lr = ul + 5
             ur = ul + 1
             ll = ul + 4
@@ -113,8 +113,13 @@ def add_subgrid_constraints_6x6(task):
             task.addConstraint("value[" + str(ur) + "] != value[" + str(ll) + "]")
 
 
-def check_uniqueness(task, size):
+def add_set_values(task, values, size):
+    for i in range(0, size**2):
+        if values[i] != 0:
+            task.setValue(i+1, values[i])
 
+
+def check_uniqueness(task, size, values):
     task.solve_BackTrack(timeout=10)
     res = ""
     for i in range(1, size**2+1):
@@ -122,19 +127,27 @@ def check_uniqueness(task, size):
             res += "value["+str(i)+"] == "+str(task.value[i])+" and "
         else:
             res += "value[" + str(i) + "] == " + str(task.value[i])
-    task.addConstraint("not ("+res+")")
-    task.solve_BackTrack(timeout=10)
-    f = open(task.solution_path + 'BackTrack_Solution.txt', 'r')
-    f.readline()
-    if f.readline() == "Time taken: No valid solution exist":
+    unique_task = create_sudoku_csp(size, path="CheckedSolutions/")
+    unique_task.addConstraint("not ("+res+")")
+    add_set_values(unique_task, values, size)
+    unique_task.solve_BackTrack(timeout=10)
+    f = open(unique_task.solution_path + 'BackTrack_Solution.txt', 'r')
+    text = f.read()
+    if "No valid solution exist" in text:
         print("Unique sudoku found")
     else:
         print("Sudoku not unique")
     f.close()
 
+
 def create_sudoku_sat(size):
     h=""
 
-task = create_sudoku_csp(9, path="Solutions/")
-
-check_uniqueness(task, 9)
+task = create_sudoku_csp(4, path="Solutions/")
+values = [0, 0, 0, 3,
+          0, 4, 0, 0,
+          1, 0, 0, 4,
+          0, 0, 3, 0]
+add_set_values(task, values, 4)
+#task.solve_BackTrack(timeout=10)
+check_uniqueness(task, 4, values)
