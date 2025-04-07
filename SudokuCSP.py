@@ -1,5 +1,6 @@
 import CSP_Solver as CS
 
+
 def create_sudoku_csp(size, path)->CS:
     cells = size*size
     task = CS.CSP(variables=cells, solution_path=path)
@@ -121,12 +122,12 @@ def add_set_values(task, values, size):
 def solve_sudoku(size, path, values)->CS:
     task = create_sudoku_csp(size, path)
     add_set_values(task, values, size)
-    task.solve_BackTrack(timeout=100)
+    task.testAllDefaultParams(timeout=100)
     return task
 
 
 def check_uniqueness(task, size, values):
-    task.solve_BackTrack(timeout=100)
+    task.testAllDefaultParams(timeout=100)
     res = ""
     for i in range(0, size):
         for j in range(0, size):
@@ -137,7 +138,7 @@ def check_uniqueness(task, size, values):
     unique_task = create_sudoku_csp(size, path="CheckedSolutions/")
     unique_task.addConstraint("not ("+res+")")
     add_set_values(unique_task, values, size)
-    unique_task.solve_BackTrack(timeout=100)
+    unique_task.testAllDefaultParams(timeout=100)
     f = open(unique_task.solution_path + 'BackTrack_Solution.txt', 'r')
     text = f.read()
     if "No valid solution exist" in text:
