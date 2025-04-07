@@ -122,13 +122,13 @@ def add_set_values(task, values, size):
 def solve_sudoku(size, path, values)->CS:
     task = create_sudoku_csp(size, path)
     add_set_values(task, values, size)
-    task.testAllDefaultParams(timeout=100)
+    task.testAllDefaultParams(timeout=10)
     return task
 
 
 def check_uniqueness(task, size, values):
     print(f"Calculating first Solution for {size}x{size} Sudoku")
-    task.testAllDefaultParams(timeout=100)
+    task.testAllDefaultParams(timeout=10)
     res = ""
     for i in range(0, size):
         for j in range(0, size):
@@ -140,11 +140,11 @@ def check_uniqueness(task, size, values):
     unique_task.addConstraint("not ("+res+")")
     add_set_values(unique_task, values, size)
     print(f"Checking uniqueness for {size}x{size} Sudoku")
-    unique_task.testAllDefaultParams(timeout=100)
-    f = open(unique_task.solution_path + 'BackTrack_Solution.txt', 'r')
+    unique_task.testAllDefaultParams(timeout=10)
+    '''f = open(unique_task.solution_path + 'BackTrack_Solution.txt', 'r')
     text = f.read()
     if "No valid solution exist" in text:
         print("Unique sudoku found")
     else:
         print("Sudoku not unique")
-    f.close()
+    f.close()'''
