@@ -99,10 +99,7 @@ def check_uniqueness(cnf, model, size):
     negated_model = [-v for v in model if v > 0]
     cnf.append(negated_model)
     with Cadical195(cnf, True) as usolver:
-        if usolver.solve():
-            print(f"SAT: The {size}x{size} sudoku is not unique {usolver.time()}")
-        else:
-            print(f"SAT: The {size}x{size} sudoku is unique {usolver.time()}")
+        return usolver.solve(), usolver.time()
 
 
 def compute_solution(model, size):
