@@ -1,4 +1,7 @@
+import time
+
 import CSP_Solver as CS
+
 
 def create_sudoku_csp(size, path)->CS:
     cells = size*size
@@ -121,12 +124,33 @@ def add_set_values(task, values, size):
 def solve_sudoku(size, path, values)->CS:
     task = create_sudoku_csp(size, path)
     add_set_values(task, values, size)
-    task.solve_BackTrack(timeout=100)
+    task.testAllDefaultParams(timeout=1)
     return task
 
 
-def check_uniqueness(task, size, values):
-    task.solve_BackTrack(timeout=100)
+def check_uniqueness(task, size, values, algorithm):
+    #print(f"Calculating first Solution for {size}x{size} Sudoku")
+    algorithm_map = {
+        "depth_first_search": lambda: task.solve_dfs(timeout=1),
+        "BackTracking": lambda: task.solve_BackTrack(timeout=1),
+        "ForwardChecking": lambda: task.solve_ForwardChecking(timeout=1),
+        "ForwardChecking_MRV": lambda: task.solve_ForwardChecking_MRV(timeout=1),
+        "ForwardChecking_MRV_LCV": lambda: task.solve_ForwardChecking_MRV_LCV(timeout=1),
+        "HillClimbing_chooseBest": lambda: task.solve_HillClimbing_chooseBest(timeout=1),
+        "HillClimbing_greedyBias": lambda: task.solve_HillClimbing_greedyBias(timeout=1),
+        "HillClimbing_chooseRandom": lambda: task.solve_HillClimbing_chooseRandom(timeout=1),
+        "GeneticAlgo": lambda: task.solve_GeneticAlgo(timeout=1),
+        "local_beam_search": lambda: task.solve_local_beam_search(timeout=1),
+        "Simulated_Annealing": lambda: task.solve_Simulated_Annealing(timeout=1),
+        "ArcConsistent_BackTracking": lambda: task.solve_ArcConsistent_BackTracking(timeout=1),
+        "novelAlgorithm": lambda: task.solve_novelAlgorithm(timeout=1)
+    }
+    first_time = 0
+    if algorithm in algorithm_map:
+        first_time_start = time.time()
+        algorithm_map[algorithm]()
+        first_time_end = time.time()
+        first_time = first_time_end - first_time_start
     res = ""
     for i in range(0, size):
         for j in range(0, size):
@@ -135,13 +159,34 @@ def check_uniqueness(task, size, values):
             else:
                 res += "value[" + str(i*size + j + 1) + "] == " + str(task.value[i*size + j + 1])
     unique_task = create_sudoku_csp(size, path="CheckedSolutions/")
-    unique_task.addConstraint("not ("+res+")")
+    unique_task.addConstraint("not (" + res + ")")
     add_set_values(unique_task, values, size)
-    unique_task.solve_BackTrack(timeout=100)
-    f = open(unique_task.solution_path + 'BackTrack_Solution.txt', 'r')
+    unique_algorithm_map = {
+        "depth_first_search": lambda: unique_task.solve_dfs(timeout=1),
+        "BackTrack": lambda: unique_task.solve_BackTrack(timeout=1),
+        "ForwardChecking": lambda: unique_task.solve_ForwardChecking(timeout=1),
+        "ForwardChecking_MRV": lambda: unique_task.solve_ForwardChecking_MRV(timeout=1),
+        "ForwardChecking_MRV_LCV": lambda: unique_task.solve_ForwardChecking_MRV_LCV(timeout=1),
+        "HillClimbing_chooseBest": lambda: unique_task.solve_HillClimbing_chooseBest(timeout=1),
+        "HillClimbing_greedyBias": lambda: unique_task.solve_HillClimbing_greedyBias(timeout=1),
+        "HillClimbing_chooseRandom": lambda: unique_task.solve_HillClimbing_chooseRandom(timeout=1),
+        "GeneticAlgo": lambda: unique_task.solve_GeneticAlgo(timeout=1),
+        "local_beam_search": lambda: unique_task.solve_local_beam_search(timeout=1),
+        "Simulated_Annealing": lambda: unique_task.solve_Simulated_Annealing(timeout=1),
+        "ArcConsistent_BackTracking": lambda: unique_task.solve_ArcConsistent_BackTracking(timeout=1),
+        "novelAlgorithm": lambda: unique_task.solve_novelAlgorithm(timeout=1)
+    }
+    #print(f"Checking uniqueness for {size}x{size} Sudoku")
+    if algorithm in unique_algorithm_map:
+        second_time_start = time.time()
+        unique_algorithm_map[algorithm]()
+        second_time_end = time.time()
+        second_time = second_time_end - second_time_start
+        return first_time, second_time
+    '''f = open(unique_task.solution_path + 'BackTrack_Solution.txt', 'r')
     text = f.read()
     if "No valid solution exist" in text:
         print("Unique sudoku found")
     else:
         print("Sudoku not unique")
-    f.close()
+    f.close()'''

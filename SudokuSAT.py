@@ -82,10 +82,10 @@ def solve_sudoku(size, hints)->(CNF, list):
     add_sudoku_hints(sudoku, hints, size)
     solver = Cadical195(sudoku)
     if solver.solve():
-        print("Sudoku is solvable")
+        print(f"SAT: {size}x{size} Sudoku is solvable! {solver.time()}")
     else:
-        print("No solution found!")
-    return sudoku, solver.get_model()
+        print(f"SAT: {size}x{size} Sudoku has no solution found! {solver.time()}")
+    return sudoku, solver.get_model(), solver.time()
 
 
 def add_sudoku_hints(cnf, puzzle, size):
@@ -98,11 +98,8 @@ def add_sudoku_hints(cnf, puzzle, size):
 def check_uniqueness(cnf, model, size):
     negated_model = [-v for v in model if v > 0]
     cnf.append(negated_model)
-    with Cadical195(cnf) as usolver:
-        if usolver.solve():
-            print("The sudoku is not unique")
-        else:
-            print("The sudoku is unique")
+    with Cadical195(cnf, True) as usolver:
+        return usolver.solve(), usolver.time()
 
 
 def compute_solution(model, size):
