@@ -29,11 +29,12 @@ hints9 = [[5, 3, 0, 0, 7, 0, 0, 0, 0],
         [0, 0, 0, 0, 8, 0, 0, 7, 9]]
 
 
-def test_sat(hints, times, solved):
+def test_sat(hints, first_times, second_times, solved):
     for sudoku in hints:
-        cnf, model = SudokuSAT.solve_sudoku(len(sudoku), sudoku)
-        solvable, time = SudokuSAT.check_uniqueness(cnf, model, len(sudoku))
-        times.append(time)
+        cnf, model, first_time = SudokuSAT.solve_sudoku(len(sudoku), sudoku)
+        solvable, second_time = SudokuSAT.check_uniqueness(cnf, model, len(sudoku))
+        first_times.append(first_time)
+        second_times.append(second_time)
         solved.append(solvable)
 
 def test_csp(hints):
@@ -59,14 +60,14 @@ def test_csp(hints):
         task = SudokuCSP.create_sudoku_csp(len(sudoku), "Solutions/")
         SudokuCSP.add_set_values(task, sudoku, len(sudoku))
         for algorithm in algorithm_keys:
-            time = SudokuCSP.check_uniqueness(task, len(sudoku), sudoku, algorithm)
-            algorithm_times.get(algorithm).append(time)
+            first_time, second_time = SudokuCSP.check_uniqueness(task, len(sudoku), sudoku, algorithm)
+            algorithm_times.get(algorithm).append((first_time, second_time))
     return algorithm_times
 
 
 
 def test_time(number_of_tests):
-    with open("sudoku_test_set.txt", "r") as f:
+    with open("sudoku_test_set_9x9.txt", "r") as f:
         hints = []
         count = 0
         for line in f:
@@ -74,14 +75,19 @@ def test_time(number_of_tests):
                 break
             hints.append(ast.literal_eval(line))
             count += 1
-    times_sat = []
+    first_times_sat = []
+    second_times_sat = []
     solvable_sat = []
-    test_sat(hints, times_sat, solvable_sat)
+    test_sat(hints, first_times_sat, second_times_sat, solvable_sat)
     times = test_csp(hints)
-    times["SAT"] = times_sat
+    times["SAT"] = first_times_sat, second_times_sat, solvable_sat
     average_times = dict.fromkeys(times)
     for key in times.keys():
-        average_times[key] = sum(times[key]) / len(times[key])
+        sum_times = 0
+        for time in times[key]:
+            first_time, second_time = time
+            sum_times += first_time+second_time
+        average_times[key] = sum_times / len(times[key])
     return times, average_times
 
 
@@ -106,4 +112,4 @@ SudokuCSP.check_uniqueness(task9, 9, hints9)
 '''
 
 
-print(test_time(10))
+print(test_time(2))

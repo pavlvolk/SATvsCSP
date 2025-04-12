@@ -145,8 +145,12 @@ def check_uniqueness(task, size, values, algorithm):
         "ArcConsistent_BackTracking": lambda: task.solve_ArcConsistent_BackTracking(timeout=1),
         "novelAlgorithm": lambda: task.solve_novelAlgorithm(timeout=1)
     }
+    first_time = 0
     if algorithm in algorithm_map:
+        first_time_start = time.time()
         algorithm_map[algorithm]()
+        first_time_end = time.time()
+        first_time = first_time_end - first_time_start
     res = ""
     for i in range(0, size):
         for j in range(0, size):
@@ -174,10 +178,11 @@ def check_uniqueness(task, size, values, algorithm):
     }
     #print(f"Checking uniqueness for {size}x{size} Sudoku")
     if algorithm in unique_algorithm_map:
-        time_start = time.time()
+        second_time_start = time.time()
         unique_algorithm_map[algorithm]()
-        time_end = time.time()
-        return time_end - time_start
+        second_time_end = time.time()
+        second_time = second_time_end - second_time_start
+        return first_time, second_time
     '''f = open(unique_task.solution_path + 'BackTrack_Solution.txt', 'r')
     text = f.read()
     if "No valid solution exist" in text:

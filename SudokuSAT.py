@@ -85,7 +85,7 @@ def solve_sudoku(size, hints)->(CNF, list):
         print(f"SAT: {size}x{size} Sudoku is solvable! {solver.time()}")
     else:
         print(f"SAT: {size}x{size} Sudoku has no solution found! {solver.time()}")
-    return sudoku, solver.get_model()
+    return sudoku, solver.get_model(), solver.time()
 
 
 def add_sudoku_hints(cnf, puzzle, size):
