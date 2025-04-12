@@ -66,8 +66,8 @@ def test_csp(hints):
 
 
 
-def test_time(number_of_tests):
-    with open("sudoku_test_set_9x9.txt", "r") as f:
+def test_time(number_of_tests, path):
+    with open(path, "r") as f:
         hints = []
         count = 0
         for line in f:
@@ -80,7 +80,10 @@ def test_time(number_of_tests):
     solvable_sat = []
     test_sat(hints, first_times_sat, second_times_sat, solvable_sat)
     times = test_csp(hints)
-    times["SAT"] = first_times_sat, second_times_sat, solvable_sat
+    times_sat = []
+    for i in range(len(first_times_sat)):
+        times_sat.append((first_times_sat[i], second_times_sat[i]))
+    times["SAT"] = times_sat
     average_times = dict.fromkeys(times)
     for key in times.keys():
         sum_times = 0
@@ -112,4 +115,6 @@ SudokuCSP.check_uniqueness(task9, 9, hints9)
 '''
 
 
-print(test_time(2))
+#print(test_time(2, "sudoku_test_set_9x9.txt"))
+#print(test_time(10, "sudoku_test_set_4x4.txt"))
+print(test_time(3, "sudoku_test_set_6x6.txt"))
